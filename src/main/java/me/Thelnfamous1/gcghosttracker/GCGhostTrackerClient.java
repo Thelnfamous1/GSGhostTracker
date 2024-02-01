@@ -11,9 +11,20 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.client.event.RenderNameTagEvent;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.Event;
 import org.jetbrains.annotations.Nullable;
 
 public class GCGhostTrackerClient {
+
+    public static void registerClientEvents(){
+        MinecraftForge.EVENT_BUS.addListener((RenderNameTagEvent event) -> {
+            if(event.getEntity() instanceof GCGhost ghost && ghost.gcghosttracker$isGhostMode()){
+                event.setResult(Event.Result.DENY);
+            }
+        });
+    }
 
     public static void registerItemProperties(){
         GCGhostTracker.LOGGER.info("Registering item properties!");

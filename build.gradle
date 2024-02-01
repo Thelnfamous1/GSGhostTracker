@@ -186,6 +186,7 @@ repositories {
             includeGroup 'net.minecraftforge'
         }
     }
+    mavenCentral()
 
     // If you have mod jar dependencies in ./libs, you can declare them as a repository like so.
     // See https://docs.gradle.org/current/userguide/declaring_repositories.html#sub:flat_dir_resolver
@@ -206,6 +207,12 @@ dependencies {
 
     // Mixin annotation processor - generates the refmap
     annotationProcessor "org.spongepowered:mixin:${mixin_version}:processor"
+
+    // MixinExtras
+    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.3.5"))
+    implementation(jarJar("io.github.llamalad7:mixinextras-forge:0.3.5")) {
+        jarJar.ranged(it, "[0.3.5,)")
+    }
 
     // Example mod dependency with JEI - using fg.deobf() ensures the dependency is remapped to your development mappings
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
