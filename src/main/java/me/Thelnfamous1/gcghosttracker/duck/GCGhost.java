@@ -6,7 +6,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameType;
 
 public interface GCGhost {
-    static void updatePlayerAbilities(ServerPlayer serverPlayer) {
+    static void handleGhostModeUpdate(ServerPlayer serverPlayer) {
         GCGhost ghost = (GCGhost) serverPlayer;
         if(ghost.gcghosttracker$hasGhostModeChanged()){
             // give spectator abilities to ghost players, or remove it for non-ghost players
@@ -17,6 +17,7 @@ public interface GCGhost {
                 serverPlayer.gameMode.getGameModeForPlayer().updatePlayerAbilities(serverPlayer.getAbilities());
                 serverPlayer.connection.send(new ClientboundPlayerAbilitiesPacket(serverPlayer.getAbilities()));
             }
+            ghost.gcghosttracker$setGhostModeChangeHandled();
         }
     }
 
@@ -33,4 +34,6 @@ public interface GCGhost {
     boolean gcghosttracker$isGhostMode();
 
     boolean gcghosttracker$hasGhostModeChanged();
+    
+    void gcghosttracker$setGhostModeChangeHandled();
 }

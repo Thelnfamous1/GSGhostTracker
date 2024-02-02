@@ -35,4 +35,9 @@ public abstract class PlayerMixin extends LivingEntity implements GCGhost {
     public boolean gcghosttracker$hasGhostModeChanged() {
         return this.gcghosttracker$ghostModeChanged;
     }
+
+    @Override
+    public void gcghosttracker$setGhostModeChangeHandled() {
+        this.gcghosttracker$ghostModeChanged = false;
+    }
 }

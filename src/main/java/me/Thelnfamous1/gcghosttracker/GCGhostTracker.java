@@ -38,7 +38,7 @@ public class GCGhostTracker {
             if(event.phase == TickEvent.Phase.END){
                 if(!event.player.level().isClientSide){
                     ServerPlayer serverPlayer = (ServerPlayer) event.player;
-                    GCGhost.updatePlayerAbilities(serverPlayer);
+                    GCGhost.handleGhostModeUpdate(serverPlayer);
                 }
             }
         });
