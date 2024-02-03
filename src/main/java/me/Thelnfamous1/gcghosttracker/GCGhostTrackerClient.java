@@ -20,7 +20,7 @@ public class GCGhostTrackerClient {
 
     public static void registerClientEvents(){
         MinecraftForge.EVENT_BUS.addListener((RenderNameTagEvent event) -> {
-            if(event.getEntity() instanceof GCGhost ghost && ghost.gcghosttracker$isGhostMode()){
+            if(event.getEntity().isSpectator() && event.getEntity() instanceof GCGhost ghost && ghost.gcghosttracker$isGhostMode()){
                 event.setResult(Event.Result.DENY);
             }
         });

@@ -13,7 +13,7 @@ public class EntityMixin {
 
     @WrapOperation(method = "push(Lnet/minecraft/world/entity/Entity;)V", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/Entity;noPhysics:Z", opcode = Opcodes.GETFIELD))
     private boolean handlePush(Entity entity, Operation<Boolean> noPhysics){
-        if(entity instanceof GCGhost ghost && ghost.gcghosttracker$isGhostMode()){
+        if(entity.isSpectator() && entity instanceof GCGhost ghost && ghost.gcghosttracker$isGhostMode()){
             return false;
         }
         return noPhysics.call(entity);

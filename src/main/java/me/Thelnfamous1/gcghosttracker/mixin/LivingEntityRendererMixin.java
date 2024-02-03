@@ -26,7 +26,7 @@ public class LivingEntityRendererMixin<
      */
     @WrapOperation(method = "render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/EntityModel;renderToBuffer(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;IIFFFF)V"))
     private void handleRenderToBuffer(M pModel, PoseStack pPoseStack, VertexConsumer pBuffer, int pPackedLight, int pPackedOverlay, float pRed, float pGreen, float pBlue, float pAlpha, Operation<Void> renderToBuffer, T pEntity){
-        if(pEntity instanceof GCGhost ghost && ghost.gcghosttracker$isGhostMode()){
+        if(pEntity.isSpectator() && pEntity instanceof GCGhost ghost && ghost.gcghosttracker$isGhostMode()){
             renderToBuffer.call(pModel, pPoseStack, pBuffer, pPackedLight, pPackedOverlay, pRed, pGreen, pBlue, 0.25F);
         } else{
             renderToBuffer.call(pModel, pPoseStack, pBuffer, pPackedLight, pPackedOverlay, pRed, pGreen, pBlue, pAlpha);
