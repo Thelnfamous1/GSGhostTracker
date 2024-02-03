@@ -13,7 +13,12 @@ public class PlayerRendererMixin {
 
     @WrapOperation(method = "setModelProperties", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/AbstractClientPlayer;isSpectator()Z"))
     private boolean handleSetModelProperties(AbstractClientPlayer player, Operation<Boolean> isSpectator){
-        return GCGhost.isActualSpectator(isSpectator.call(player), player);
+        boolean spectator = isSpectator.call(player);
+        if(spectator && ((GCGhost) player).gcghosttracker$isGhostMode()){
+            return false;
+        } else{
+            return spectator;
+        }
     }
 
 }

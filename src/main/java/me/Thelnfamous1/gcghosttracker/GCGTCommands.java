@@ -7,29 +7,33 @@ import me.Thelnfamous1.gcghosttracker.duck.GCGhost;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.network.PacketDistributor;
+import net.minecraft.world.level.GameRules;
 
 public class GCGTCommands {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher){
-        LiteralArgumentBuilder<CommandSourceStack> secondChance = Commands.literal("secondchance").requires(source -> source.hasPermission(4));
+        LiteralArgumentBuilder<CommandSourceStack> secondChance = Commands.literal("secondchance").requires(source -> source.hasPermission(2));
         secondChance.then(Commands.argument("player", EntityArgument.player())
                 .then(Commands.argument("enable", BoolArgumentType.bool())
                         .executes(ctx -> {
-                            Player player = EntityArgument.getPlayer(ctx, "player");
+                            ServerPlayer player = EntityArgument.getPlayer(ctx, "player");
                             boolean enable = BoolArgumentType.getBool(ctx, "enable");
+                            boolean wasGhost = ((GCGhost)player).gcghosttracker$isGhostMode();
                             ((GCGhost)player).gcghosttracker$setGhostMode(enable);
-                            GCGTNetwork.SYNC_CHANNEL.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player), new GhostSyncPacket(player, enable));
+                            if(wasGhost != enable){
+                                logGhostModeChange(ctx.getSource(), player, enable);
+                            }
                             return 1;
                         })));
         LiteralArgumentBuilder<CommandSourceStack> targetcompass = Commands.literal("targetcompass").requires(source -> source.hasPermission(4));
         targetcompass.then(Commands.argument("player", EntityArgument.player())
                 .then(Commands.argument("tracking", EntityArgument.player())
                         .executes(ctx -> {
-                            Player player = EntityArgument.getPlayer(ctx, "player");
-                            Player tracking = EntityArgument.getPlayer(ctx, "tracking");
+                            ServerPlayer player = EntityArgument.getPlayer(ctx, "player");
+                            ServerPlayer tracking = EntityArgument.getPlayer(ctx, "tracking");
                             ItemStack playerTrackerCompass = GCGhostTracker.PLAYER_TRACKER_COMPASS.get().getDefaultInstance();
                             PlayerTrackerCompassItem.track(playerTrackerCompass, tracking);
                             if(!player.getInventory().add(playerTrackerCompass)){
@@ -39,5 +43,25 @@ public class GCGTCommands {
                         })));
         dispatcher.register(secondChance);
         dispatcher.register(targetcompass);
+    }
+
+
+
+    private static void logGhostModeChange(CommandSourceStack pSource, ServerPlayer pPlayer, boolean enable) {
+        Component component = enable ? Component.translatable("gameMode.%s.ghost".formatted(GCGhostTracker.MODID)) : Component.translatable("gameMode.%s".formatted(pPlayer.gameMode.getGameModeForPlayer().getName()));
+        if (pSource.getEntity() == pPlayer) {
+            pSource.sendSuccess(() -> {
+                return Component.translatable("commands.gamemode.success.self", component);
+            }, true);
+        } else {
+            if (pSource.getLevel().getGameRules().getBoolean(GameRules.RULE_SENDCOMMANDFEEDBACK)) {
+                pPlayer.sendSystemMessage(Component.translatable("gameMode.changed", component));
+            }
+
+            pSource.sendSuccess(() -> {
+                return Component.translatable("commands.gamemode.success.other", pPlayer.getDisplayName(), component);
+            }, true);
+        }
+
     }
 }

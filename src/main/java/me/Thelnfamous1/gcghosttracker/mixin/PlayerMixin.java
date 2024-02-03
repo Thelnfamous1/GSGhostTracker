@@ -13,8 +13,6 @@ public abstract class PlayerMixin extends LivingEntity implements GCGhost {
 
     @Unique
     private boolean gcghosttracker$ghostMode;
-    @Unique
-    private boolean gcghosttracker$ghostModeChanged;
 
     protected PlayerMixin(EntityType<? extends LivingEntity> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -22,8 +20,14 @@ public abstract class PlayerMixin extends LivingEntity implements GCGhost {
 
     @Override
     public void gcghosttracker$setGhostMode(boolean enable) {
-        this.gcghosttracker$ghostModeChanged = this.gcghosttracker$ghostMode != enable;
-        this.gcghosttracker$ghostMode = enable;
+        if(this.gcghosttracker$ghostMode != enable){
+            this.gcghosttracker$ghostMode = enable;
+            this.gcghosttracker$onGhostModeChanged();
+        }
+    }
+
+    @Unique
+    protected void gcghosttracker$onGhostModeChanged(){
     }
 
     @Override
@@ -31,13 +35,4 @@ public abstract class PlayerMixin extends LivingEntity implements GCGhost {
         return this.gcghosttracker$ghostMode;
     }
 
-    @Override
-    public boolean gcghosttracker$hasGhostModeChanged() {
-        return this.gcghosttracker$ghostModeChanged;
-    }
-
-    @Override
-    public void gcghosttracker$setGhostModeChangeHandled() {
-        this.gcghosttracker$ghostModeChanged = false;
-    }
 }

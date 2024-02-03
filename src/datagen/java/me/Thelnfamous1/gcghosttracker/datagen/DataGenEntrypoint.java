@@ -41,7 +41,7 @@ public class DataGenEntrypoint {
             @Override
             protected void addTranslations() {
                 this.add(GCGhostTracker.PLAYER_TRACKER_COMPASS.get(), "Player Tracker Compass");
-                this.add(GCGhostTracker.PLAYER_TRACKER_COMPASS.get().getDescriptionId() + ".tracking", "Tracking");
+                this.add("gameMode.%s.ghost".formatted(GCGhostTracker.MODID), "Ghost Mode");
             }
         });
         generator.addProvider(event.includeClient(), new ItemModelProvider(generator.getPackOutput(), GCGhostTracker.MODID, existingFileHelper) {

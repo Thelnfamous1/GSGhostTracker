@@ -49,7 +49,7 @@ public class GCGhostTrackerClient {
 
                             CompoundTag tag = stack.getTag();
                             if (tag != null && tag.contains(PlayerTrackerCompassItem.ROTATIONS_TAG) && tag.contains(PlayerTrackerCompassItem.ENTITY_TAG) && !stack.isFramed()) {
-                                return (float) PlayerTrackerCompassItem.positiveModulo(PlayerTrackerCompassItem.RotationData.read(tag.getCompound(PlayerTrackerCompassItem.ROTATIONS_TAG)).rotation, 1.0F);
+                                return (float) PlayerTrackerCompassItem.positiveModulo(PlayerTrackerCompassItem.RotationData.read(tag.getCompound(PlayerTrackerCompassItem.ROTATIONS_TAG)).rotation(), 1.0F);
                             } else {
                                 double randRotation = Math.random();
 

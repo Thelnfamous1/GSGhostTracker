@@ -1,13 +1,10 @@
 package me.Thelnfamous1.gcghosttracker;
 
 import com.mojang.logging.LogUtils;
-import me.Thelnfamous1.gcghosttracker.duck.GCGhost;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -34,14 +31,6 @@ public class GCGhostTracker {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         ITEMS.register(modEventBus);
         MinecraftForge.EVENT_BUS.addListener((RegisterCommandsEvent event) -> GCGTCommands.register(event.getDispatcher()));
-        MinecraftForge.EVENT_BUS.addListener((TickEvent.PlayerTickEvent event) -> {
-            if(event.phase == TickEvent.Phase.END){
-                if(!event.player.level().isClientSide){
-                    ServerPlayer serverPlayer = (ServerPlayer) event.player;
-                    GCGhost.handleGhostModeUpdate(serverPlayer);
-                }
-            }
-        });
         if(FMLEnvironment.dist == Dist.CLIENT){
             GCGhostTrackerClient.registerClientEvents();
         }

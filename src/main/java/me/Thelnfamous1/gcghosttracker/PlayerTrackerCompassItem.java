@@ -4,19 +4,14 @@ import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
-import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CompassItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-
-import java.util.List;
 
 public class PlayerTrackerCompassItem extends CompassItem {
     public static final String TRACKING_TAG = "TrackingPlayer";
@@ -104,17 +99,6 @@ public class PlayerTrackerCompassItem extends CompassItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Level world, List<Component> tooltip, TooltipFlag flagIn) {
-        CompoundTag tag = stack.getTag();
-        if (tag != null && tag.contains(TRACKING_TAG) && tag.contains(ENTITY_TAG)) {
-            PlayerStatusData status = PlayerStatusData.read(tag.getCompound(ENTITY_TAG));
-            tooltip.add(CommonComponents.optionNameValue(
-                    Component.translatable(GCGhostTracker.PLAYER_TRACKER_COMPASS.get().getDescriptionId() + ".tracking"),
-                    Component.literal(status.name)));
-        }
-    }
-
-    @Override
     public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
         return false;
     }
@@ -150,46 +134,27 @@ public class PlayerTrackerCompassItem extends CompassItem {
         return (numerator % denominator + denominator) % denominator;
     }
 
-    static class PlayerStatusData {
-        public final String name;
-        public final BlockPos pos;
-
-        public PlayerStatusData(String name, BlockPos pos) {
-            this.name = name;
-            this.pos = pos;
-        }
+    public record PlayerStatusData(BlockPos pos) {
 
         public static PlayerStatusData read(CompoundTag compound) {
-            return new PlayerStatusData(
-                    compound.getString("Name"),
-                    NbtUtils.readBlockPos(compound.getCompound("Pos")));
+                return new PlayerStatusData(
+                        NbtUtils.readBlockPos(compound.getCompound("Pos")));
+            }
+
+            public static CompoundTag write(Player trackedPlayer) {
+                CompoundTag tag = new CompoundTag();
+                tag.put("Pos", NbtUtils.writeBlockPos(trackedPlayer.blockPosition()));
+                return tag;
+            }
+
+            public static CompoundTag writeMissingPlayer(PlayerStatusData status) {
+                CompoundTag tag = new CompoundTag();
+                tag.put("Pos", NbtUtils.writeBlockPos(status.pos));
+                return tag;
+            }
         }
 
-        public static CompoundTag write(Player trackedPlayer) {
-            CompoundTag tag = new CompoundTag();
-            tag.putString("Name", trackedPlayer.getName().getString());
-            tag.put("Pos", NbtUtils.writeBlockPos(trackedPlayer.blockPosition()));
-            return tag;
-        }
-
-        public static CompoundTag writeMissingPlayer(PlayerStatusData status) {
-            CompoundTag tag = new CompoundTag();
-            tag.putString("Name", status.name);
-            tag.put("Pos", NbtUtils.writeBlockPos(status.pos));
-            return tag;
-        }
-    }
-
-    static class RotationData {
-        public final double rotation;
-        private final double rota;
-        private final long lastUpdateTick;
-
-        public RotationData(double rotation, double rota, long lastUpdateTick) {
-            this.rotation = rotation;
-            this.rota = rota;
-            this.lastUpdateTick = lastUpdateTick;
-        }
+    public record RotationData(double rotation, double rota, long lastUpdateTick) {
 
         public static RotationData read(CompoundTag compound) {
             return new RotationData(compound.getDouble("Rotation"), compound.getDouble("Rota"), compound.getLong("LastUpdateTick"));
