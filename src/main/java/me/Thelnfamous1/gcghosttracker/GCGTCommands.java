@@ -15,7 +15,7 @@ import net.minecraft.world.level.GameRules;
 public class GCGTCommands {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher){
-        LiteralArgumentBuilder<CommandSourceStack> secondChance = Commands.literal("secondchance").requires(source -> source.hasPermission(2));
+        LiteralArgumentBuilder<CommandSourceStack> secondChance = Commands.literal("secondchance").requires(source -> source.hasPermission(4));
         secondChance.then(Commands.argument("player", EntityArgument.player())
                 .then(Commands.argument("enable", BoolArgumentType.bool())
                         .executes(ctx -> {
