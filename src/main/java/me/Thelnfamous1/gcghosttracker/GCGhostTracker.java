@@ -1,10 +1,13 @@
 package me.Thelnfamous1.gcghosttracker;
 
 import com.mojang.logging.LogUtils;
+import me.Thelnfamous1.gcghosttracker.duck.GCGhost;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -12,6 +15,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
@@ -34,6 +38,12 @@ public class GCGhostTracker {
         if(FMLEnvironment.dist == Dist.CLIENT){
             GCGhostTrackerClient.registerClientEvents();
         }
+        MinecraftForge.EVENT_BUS.addListener((PlayerEvent.StartTracking event) -> {
+            if(event.getTarget() instanceof ServerPlayer serverPlayer){
+                GCGTNetwork.SYNC_CHANNEL.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) event.getEntity()),
+                        new GhostSyncPacket(serverPlayer, ((GCGhost)serverPlayer).gcghosttracker$isGhostMode()));
+            }
+        });
     }
 
     @SubscribeEvent

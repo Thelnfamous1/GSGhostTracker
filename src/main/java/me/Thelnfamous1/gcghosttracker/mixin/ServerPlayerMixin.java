@@ -1,7 +1,10 @@
 package me.Thelnfamous1.gcghosttracker.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import me.Thelnfamous1.gcghosttracker.GCGTNetwork;
 import me.Thelnfamous1.gcghosttracker.GhostSyncPacket;
+import me.Thelnfamous1.gcghosttracker.duck.GCGhost;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -36,6 +39,16 @@ public abstract class ServerPlayerMixin extends PlayerMixin{
     private void handleAttack(Entity pTargetEntity, CallbackInfo ci){
         if(this.isSpectator() && this.gcghosttracker$isGhostMode()){
             ci.cancel();
+        }
+    }
+
+    @WrapOperation(method = "broadcastToPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;isSpectator()Z", ordinal = 1))
+    private boolean handleBroadcastToPlayer(ServerPlayer player, Operation<Boolean> isSpectator){
+        boolean spectator = isSpectator.call(player);
+        if(spectator && ((GCGhost) player).gcghosttracker$isGhostMode()){
+            return false;
+        } else{
+            return spectator;
         }
     }
 }

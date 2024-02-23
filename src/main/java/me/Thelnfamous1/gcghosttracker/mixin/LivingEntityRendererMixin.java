@@ -6,6 +6,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import me.Thelnfamous1.gcghosttracker.duck.GCGhost;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
@@ -30,6 +31,15 @@ public class LivingEntityRendererMixin<
             renderToBuffer.call(pModel, pPoseStack, pBuffer, pPackedLight, pPackedOverlay, pRed, pGreen, pBlue, 0.25F);
         } else{
             renderToBuffer.call(pModel, pPoseStack, pBuffer, pPackedLight, pPackedOverlay, pRed, pGreen, pBlue, pAlpha);
+        }
+    }
+
+    @WrapOperation(method = "render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isInvisibleTo(Lnet/minecraft/world/entity/player/Player;)Z"))
+    private boolean handleIsInvisibleTo(T pEntity, Player player, Operation<Boolean> isInvisibleTo){
+        if(pEntity.isSpectator() && pEntity instanceof GCGhost ghost && ghost.gcghosttracker$isGhostMode()){
+            return false;
+        } else{
+            return isInvisibleTo.call(pEntity, player);
         }
     }
 }

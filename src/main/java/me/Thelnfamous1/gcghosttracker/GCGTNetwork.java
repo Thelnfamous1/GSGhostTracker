@@ -1,8 +1,11 @@
 package me.Thelnfamous1.gcghosttracker;
 
 import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
+
+import java.util.Optional;
 
 public class GCGTNetwork {
     private static final ResourceLocation CHANNEL_NAME = new ResourceLocation(GCGhostTracker.MODID, "sync");
@@ -15,6 +18,6 @@ public class GCGTNetwork {
     private static int INDEX;
 
     public static void init(){
-        SYNC_CHANNEL.registerMessage(INDEX++, GhostSyncPacket.class, GhostSyncPacket::write, GhostSyncPacket::new, GhostSyncPacket::handle);
+        SYNC_CHANNEL.registerMessage(INDEX++, GhostSyncPacket.class, GhostSyncPacket::write, GhostSyncPacket::new, GhostSyncPacket::handle, Optional.of(NetworkDirection.PLAY_TO_CLIENT));
     }
 }

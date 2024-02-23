@@ -27,7 +27,6 @@ public class GCGhostTrackerClient {
     }
 
     public static void registerItemProperties(){
-        GCGhostTracker.LOGGER.info("Registering item properties!");
         ItemProperties.register(
                 GCGhostTracker.PLAYER_TRACKER_COMPASS.get(),
                 new ResourceLocation("angle"),
@@ -81,5 +80,6 @@ public class GCGhostTrackerClient {
         if(player != null){
             ((GCGhost)player).gcghosttracker$setGhostMode(packet.isEnabled());
         }
+
     }
 }
