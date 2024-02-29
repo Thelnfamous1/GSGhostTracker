@@ -6,10 +6,12 @@
   "mixins": [
     "EntityMixin",
     "PlayerMixin",
+    "ServerPlayerGameModeMixin",
     "ServerPlayerMixin"
   ],
   "client": [
     "LivingEntityRendererMixin",
+    "MultiPlayerGameModeMixin",
     "PlayerRendererMixin"
   ],
   "minVersion": "0.8.5"
